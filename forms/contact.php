@@ -1,4 +1,7 @@
 <?php
+ require 'vendor/autoload.php';
+  action="https://formspree.io/f/mkgnndkv"
+  method="POST"
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form inputs
     $name = htmlspecialchars(trim($_POST['name']));

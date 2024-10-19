@@ -1,16 +1,30 @@
 <?php
-require 'vendor/autoload.php';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve form inputs
+    $name = htmlspecialchars(trim($_POST['name']));
+    $email = htmlspecialchars(trim($_POST['email']));
+    $subject = htmlspecialchars(trim($_POST['subject']));
+    $message = htmlspecialchars(trim($_POST['message']));
 
-$transport = (new Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl'))
-  ->setUsername('roohzahidhasan@gmail.com')
-  ->setPassword('@Jahid15111998@');
+    // Email to which the form data will be sent
+    $to = "roohjahidhasan@yahoo.com";  // Replace with your email address
 
-$mailer = new Swift_Mailer($transport);
+    // Prepare email headers
+    $headers = "From: $name <$email>\r\n";
+    $headers .= "Reply-To: $email\r\n";
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 
-$message = (new Swift_Message('Hello'))
-  ->setFrom(['roohzahidhasan@gmail.com' => 'John Doe'])
-  ->setTo(['receiver@domain.org', 'other@domain.org' => 'A name'])
-  ->setBody('Here is the message itself');
+    // Create email content
+    $email_body = "Name: $name\n";
+    $email_body .= "Email: $email\n";
+    $email_body .= "Subject: $subject\n";
+    $email_body .= "Message:\n$message\n";
 
-$result = $mailer->send($message);
+    // Send email
+    if (mail($to, $subject, $email_body, $headers)) {
+        echo "Thank you for contacting us, $name. We will get back to you soon.";
+    } else {
+        echo "Sorry, there was an error sending your message. Please try again later.";
+    }
+}
 ?>

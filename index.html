@@ -603,7 +603,7 @@
           </div>
 
           <div class="col-lg-7 mt-5 mt-lg-0 d-flex align-items-stretch">
-  <form id="contactForm" action="https://formspree.io/f/mkgnndkv" method="post" data-redirect="/thanks" role="form" class="php-email-form">
+  <form id="contactForm" action="https://formspree.io/f/mkgnndkv" method="post" data-redirect="/thanks" role="form" class="1php-email-form">
     <div class="row">
       <div class="form-group col-md-6">
         <label for="name">Your Name</label>
@@ -629,21 +629,30 @@
     </div>
     <div class="text-center"><button type="submit">Send Message</button></div>
   </form>
-</div>
+ <div class="loading" style="display:none;">Submitting your form...</div>
+<div class="sent-message" style="display:none;">Your message has been sent. Thank you!</div>
+<div class="error-message" style="display:none;">There was a problem with your submission. Please try again.</div>
 
-<script>
+</div>
+          <script>
   document.getElementById('contactForm').addEventListener('submit', async function(event) {
     event.preventDefault(); // Prevent the default form submission
 
     const form = event.target;
     const formData = new FormData(form);
-    
+
+    // Select message elements for display
+    const loadingMessage = document.querySelector('.loading');
+    const sentMessage = document.querySelector('.sent-message');
+    const errorMessage = document.querySelector('.error-message');
+
     try {
       // Show loading message
-      const loadingMessage = document.querySelector('.loading');
       loadingMessage.style.display = 'block';
+      errorMessage.style.display = 'none';
+      sentMessage.style.display = 'none';
 
-      // Send the form data to Formspree
+      // Send form data to server
       const response = await fetch(form.action, {
         method: 'POST',
         body: formData,
@@ -652,30 +661,31 @@
         }
       });
 
-      // Check if the request was successful
-      if (response.ok) {
-        // Show success message and hide the form
-        const sentMessage = document.querySelector('.sent-message');
-        sentMessage.style.display = 'block';
-        loadingMessage.style.display = 'none';
+      // Parse the JSON response
+      const data = await response.json();
 
-        // Redirect to thank-you page after a short delay
+      // Check if the request was successful
+      if (response.ok && data.ok) {
+        // Hide loading message, show success message
+        loadingMessage.style.display = 'none';
+        sentMessage.style.display = 'block';
+
+        // Redirect to the "next" URL provided by the server
         setTimeout(() => {
-          window.location.href ='/thanks.html?language=en'; // Redirect to your thank-you page
-        }, 3000);
+          window.location.href = data.next; // Redirect to the thank-you page
+        }, 2000); // Adjust the delay if needed
       } else {
-        // Handle error response
-        const errorMessage = document.querySelector('.error-message');
+        // Handle error if the response was not successful
+        loadingMessage.style.display = 'none';
         errorMessage.textContent = 'There was a problem with your submission. Please try again.';
         errorMessage.style.display = 'block';
-        loadingMessage.style.display = 'none';
       }
     } catch (error) {
+      // Handle any errors that occur during the fetch
       console.error('Error:', error);
-      const errorMessage = document.querySelector('.error-message');
+      loadingMessage.style.display = 'none';
       errorMessage.textContent = 'There was a problem with your submission. Please try again.';
       errorMessage.style.display = 'block';
-      loadingMessage.style.display = 'none';
     }
   });
 </script>
